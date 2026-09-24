@@ -5,11 +5,6 @@ SoundLibrary.List = {}
 local sounds = "https://raw.githubusercontent.com/iusearchbtwn/storage/refs/heads/main/sounds/sounds.json"
 
 function SoundLibrary:Init()
-    if sounds == "" or sounds == "https://raw.githubusercontent.com/iusearchbtwn/storage/refs/heads/main/sounds/sounds.json" then
-        warn("Please provide a valid URL in the 'sounds' variable")
-        return self
-    end
-
     local success, response = pcall(function()
         return game:HttpGet(sounds)
     end)
@@ -22,16 +17,19 @@ function SoundLibrary:Init()
     local soundData = HttpService:JSONDecode(response)
     if makefolder then makefolder("DownloadedSounds") end
 
+    -- Отрезаем "sounds.json" от ссылки, оставляя "https://.../main/sounds/"
     local baseUrl = sounds:gsub("sounds%.json$", "")
 
     for soundEventName, eventData in pairs(soundData) do
-        if eventData.sounds and eventData.sounds then
-            local rawSoundPath = eventData.sounds
+        -- Извлекаем первый элемент из массива звуков (eventData.sounds[1])
+        if eventData.sounds and eventData.sounds[1] then
+            local rawSoundPath = eventData.sounds[1]
             local cleanSoundName = rawSoundPath:gsub("^.-:", "")
             local fileName = "DownloadedSounds/" .. cleanSoundName .. ".ogg"
             
             if not isfile(fileName) then
-                local fileUrl = baseUrl .. "sounds/" .. cleanSoundName .. ".ogg"
+                -- baseUrl уже содержит "/sounds/", просто добавляем имя файла
+                local fileUrl = baseUrl .. cleanSoundName .. ".ogg"
                 local downloadSuccess, fileBytes = pcall(function()
                     return game:HttpGet(fileUrl)
                 end)
