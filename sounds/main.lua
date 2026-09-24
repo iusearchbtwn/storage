@@ -17,18 +17,15 @@ function SoundLibrary:Init()
     local soundData = HttpService:JSONDecode(response)
     if makefolder then makefolder("DownloadedSounds") end
 
-    -- Отрезаем "sounds.json" от ссылки, оставляя "https://.../main/sounds/"
     local baseUrl = sounds:gsub("sounds%.json$", "")
 
     for soundEventName, eventData in pairs(soundData) do
-        -- Извлекаем первый элемент из массива звуков (eventData.sounds[1])
         if eventData.sounds and eventData.sounds[1] then
             local rawSoundPath = eventData.sounds[1]
             local cleanSoundName = rawSoundPath:gsub("^.-:", "")
             local fileName = "DownloadedSounds/" .. cleanSoundName .. ".ogg"
             
             if not isfile(fileName) then
-                -- baseUrl уже содержит "/sounds/", просто добавляем имя файла
                 local fileUrl = baseUrl .. cleanSoundName .. ".ogg"
                 local downloadSuccess, fileBytes = pcall(function()
                     return game:HttpGet(fileUrl)
